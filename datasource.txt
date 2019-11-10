@@ -1,0 +1,2 @@
+https://catalog.data.gov/dataset/tiger-line-shapefile-2016-state-washington-current-county-subdivision-state-based
+https://catalog.data.gov/dataset/tiger-line-shapefile-2016-state-oregon-current-county-subdivision-state-based
