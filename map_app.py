@@ -17,7 +17,7 @@ server = app.server
 
 
 # Plotly mapbox public token
-mapbox_access_token = "pk.eyJ1IjoiYm9pbGVkdG9mdSIsImEiOiJjazJzZTM4a2MwenBrM2lxZWZvdDg5MGt5In0.lcv3O0F-Xj9wkISq8wM68A"
+mapbox_access_token = "pk.eyJ1IjoibWVpeGluLXdhbmciLCJhIjoiY2p6aW5scmo0MDB6ejNlazhidnFoYjB5MSJ9.QgnWR6h9ZMhEPRiPj_d7-g"
 
 # Dictionary of important locations in Mexico City
 list_of_locations = {
@@ -52,8 +52,8 @@ app.layout = html.Div(
                         html.Img(className="logo", src=app.get_asset_url("dash-logo-new.png")),
                         html.H2("Predicting Risk of Fire Using Historical Data"),
                         html.P(
-                            """Select different days using the date picker or by selecting
-                            different time frames on the histogram."""
+                            """Select different month using the month picker or by selecting
+                             on the histogram."""
                         ),
 
                         # Change to side-by-side for mobile layout
@@ -70,7 +70,8 @@ app.layout = html.Div(
                                                 {"label": i, "value": i}
                                                 for i in list_of_locations
                                             ],
-                                            placeholder="Select a location",
+                                            value = 'Washington',
+                                            placeholder="Select a state",
                                         )
                                     ],
                                 ),
@@ -87,6 +88,7 @@ app.layout = html.Div(
                                                 }
                                                 for n in range(12)
                                             ],
+                                            value='Aug',
                                             placeholder="Select a month",
                                         )
                                     ],
@@ -96,10 +98,10 @@ app.layout = html.Div(
                         html.P(id="total-fires"),
                         html.P(id="total-fires-selection"),
                         html.P(id="month-value"),
-                        #dcc.Markdown(
-                            #children=[
-                                #"Source: [FiveThirtyEight](https://github.com/fivethirtyeight/uber-tlc-foil-response/tree/master/uber-trip-data)"
-                            #]),
+                        dcc.Markdown(
+                            children=[
+                                "Source: [Cumulative MODIS fire detection](https://fsapps.nwcg.gov/gisdata.php)"
+                            ]),
                     ],
                     #style = {'width': '40%','display':'inline-block'}
                 ),
@@ -111,7 +113,7 @@ app.layout = html.Div(
                         html.Div(
                             className="text-padding",
                             children=[
-                                "View the risk of fire in a selected month."
+                                "View the number of fires changing over a year in 2014-2018 in a selected state."
                             ],
                         ),
                         dcc.Graph(id="histogram"),
@@ -127,41 +129,43 @@ app.layout = html.Div(
 # if the hours are selected
 def get_selection(location,monthSelected):
     xVal = []
-    yVal = []
+    yVal = list(df_m[df_m.state==location].num)
     xSelected = []
     colorVal = [
-        "#F4EC15",
-        "#DAF017",
-        "#BBEC19",
-        "#9DE81B",
-        "#80E41D",
-        "#66E01F",
-        "#4CDC20",
-        "#34D822",
-        "#24D249",
-        "#25D042",
-        "#26CC58",
-        "#28C86D"
+        "#ffbaba",
+        "#ff7b7b",
+        "#ff7b7b",
+        "#ff5252",
+        "#ff0000",
+        "#a70000",
+        "#a70000",
+        "#ff0000",
+        "#ff5252",
+        "#ff7b7b",
+        "#ff7b7b",
+        "#ffbaba"
     ]
 
     for i in range(12):
         # If bar is selected then color it white
         if monthList[i] == monthSelected:
-            colorVal[i] = "#FFFFFF"
-        xVal.append(i+1)
-        # Get the number of rides at a particular time
-        yVal.append(df_m[(df_m.month == monthList[i]) & (df_m.state==location)].num)
+            colorVal[i+1] = "#FFFFFF"
+        xVal.append(i)
     return [np.array(xVal), np.array(yVal), np.array(colorVal)]
 
 
 # Selected Data in the Histogram updates the Values in the DatePicker
 @app.callback(
     Output("bar-selector", "value"),
-    [Input("histogram", "clickData")],
+    [Input("histogram", "selectedData"),Input("histogram", "clickData")],
 )
-def update_bar_selector(clickData):
+def update_bar_selector(value,clickData):
+    holder = ''
     if clickData:
-        holder=str(int(clickData["points"][0]["x"]))
+        holder=monthList[int(clickData["points"][0]["x"])-1]
+    if value:
+        for x in value["points"]:
+            holder=monthList[int(x["x"])-1]
     return holder
 
 # Clear Selected Data if Click Data is used
@@ -186,7 +190,7 @@ def update_total_rides(monthPicked):
 def update_total_rides_selection(monthPicked):
     firstOutput = "Total Pings in Selection: {:,d}".format(
         sum(df[df.month==monthPicked].num))
-    return firstOutput
+    return (firstOutput, 'in the month: '+monthPicked)
 
 
 # Update Histogram Figure based on states Chosen
@@ -198,7 +202,7 @@ def update_histogram(locationPicked,selection):
     [xVal, yVal, colorVal] = get_selection(locationPicked,selection)
 
     layout = go.Layout(
-        bargap=0.01,
+        bargap=0.3,
         bargroupgap=0,
         barmode="group",
         margin=go.layout.Margin(l=10, r=0, t=0, b=50),
@@ -208,11 +212,11 @@ def update_histogram(locationPicked,selection):
         dragmode="select",
         font=dict(color="white"),
         xaxis=dict(
-            range=[-0.5, 23.5],
+            range=[0.5, 12.5],
             showgrid=False,
-            nticks=25,
+            nticks=13,
             fixedrange=True,
-            ticksuffix=":00",
+            #ticksuffix=":00",
         ),
         yaxis=dict(
             range=[0, max(yVal) + max(yVal) / 4],
@@ -267,39 +271,39 @@ def update_geo_map(selectedLocation, month):
     latInitial = 43.8041
     lonInitial = -120.5542
     bearing = 0
-    mon = monthList.index(month)
 
     if selectedLocation:
         zoom = 12.0
         latInitial = list_of_locations[selectedLocation]["lat"]
         lonInitial = list_of_locations[selectedLocation]["lon"]
 
-    listCoords = df[df.month==mon+1][['lat','lon','num']]
+    listCoords = df[df.month==month][['lat','lon','num']]
     return go.Figure(
         data=[
             # Data for all rides based on date and time
             Scattermapbox(
-                lat=listCoords["lat"],
-                lon=listCoords["lon"],
+                lat=list(listCoords["lat"]),
+                lon=list(listCoords["lon"]),
                 mode="markers",
                 hoverinfo="lat+lon+text",
                 text=listCoords["num"],
                 marker=dict(
                     showscale=True,
-                    color=np.append(np.insert(listCoords["num"], 0, 0), 2000),
-                    opacity=0.5,
-                    size=5,
+                    color=np.insert(list(listCoords["num"]), 0, 0),
+                    opacity=0.9,
+                    size=25,
+                    #colorscale="Reds"
                     colorscale=[
-                        [0, "#21c7ef"],
-                        [0.33, "#76f2ff"],
-                        [0.66, "#ff6969"],
-                        [1, "#ff1717"],
+                        #[0, "#428bca"],
+                        [0, "#f9f9f9"],
+                        [0.5, "#ff6969"],
+                        [1, "#d9534f"],
                     ],
                     colorbar=dict(
-                        title="Time of<br>Day",
+                        title="Number<br>of Fires",
                         x=0.93,
                         xpad=0,
-                        nticks=24,
+                        nticks=12,
                         tickfont=dict(color="#d8d8d8"),
                         titlefont=dict(color="#d8d8d8"),
                         thicknessmode="pixels",
@@ -323,7 +327,7 @@ def update_geo_map(selectedLocation, month):
             mapbox=dict(
                 accesstoken=mapbox_access_token,
                 center=dict(lat=latInitial, lon=lonInitial),  # 19.5  # -99
-                style="dark",
+                style="mapbox://styles/meixin-wang/ck2tvfsup5q9a1cnz45ewomg1",
                 bearing=bearing,
                 zoom=zoom,
             ),
