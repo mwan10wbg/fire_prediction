@@ -21,3 +21,5 @@ Clone and cd into the repo, then run `pip install requirements.txt`
 Once requirements are satisfied, run `python app.py`
 
 If the app does not open in your browser, navigate to `http://127.0.0.1:8050/`
+
+![alt text](https://github.com/mwan10wbg/fire_prediction/blob/master/result/app%20demo.PNG)
