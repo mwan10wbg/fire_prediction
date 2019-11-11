@@ -7,7 +7,9 @@ Plots 120,000 historical data points in the last five years of forest fires in t
 
 We utilized open historical data of past fires in Washington, Oregon, and California and aimed to show trends with Plotly in Python. The data is from the following sources:
   
-<a href="https://fsapps.nwcg.gov/gisdata.php"> USDA Forest Service:California </a>
+<a href="https://fsapps.nwcg.gov/gisdata.php"> USDA Forest Service: Cumulative MODIS fire detections </a>
+
+<a href="https://catalog.data.gov/dataset/tiger-line-shapefile-2016-state-california-current-county-subdivision-state-based"> Data.gov:California </a>
 
 <a href="https://catalog.data.gov/dataset/tiger-line-shapefile-2016-state-washington-current-county-subdivision-state-based"> Data.gov:Washington </a>
 
