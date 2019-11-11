@@ -3,7 +3,7 @@
 <strong> about </strong>
 We were inspired by recent forest fires in the west coast to experiment with the feasibility of predicting forest fires so authorities may take the necessary preventative measures.
 
-Plots 120,000 historical data points in the last five years of forest fires in the states of Washington, California and Oregon to reveal trends. Used clustering model to detect spots that have high risk to forest fire
+Plots around 195,000 historical data points in the last five years of forest fires in the states of Washington, California and Oregon to reveal trends. Used clustering model to detect spots that have high risk to forest fire
 
 We utilized open historical data of past fires in Washington, Oregon, and California and aimed to show trends with Plotly in Python. The data is from the following sources:
   
