@@ -5,7 +5,7 @@ We were inspired by recent forest fires in the west coast to experiment with the
 
 Plots around 195,000 historical data points in the last five years of forest fires in the states of Washington, California and Oregon to reveal trends. Used clustering model to detect spots that have high risk to forest fire
 
-We utilized open historical data of past fires in Washington, Oregon, and California and aimed to cluster the high-risk spots and show trends with Plotly in Python. The data is from the following sources:
+We utilized open historical data of past fires in Washington, Oregon, and California and aimed to show trends with Plotly in Python. The data is from the following sources:
   
 <a href="https://fsapps.nwcg.gov/gisdata.php"> USDA Forest Service: Cumulative MODIS fire detections </a>
 
